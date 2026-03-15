@@ -6,6 +6,7 @@ import { handleResponse, handleLogout } from './utils.jsx'
 function App() {
   const [user, setUser] = useState(null);
   const [isAuth, setIsAuth] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
   const onLogout = () => handleLogout({ setUser, setIsAuth });
 
@@ -19,6 +20,7 @@ function App() {
       });
       const result = await response.json();
       handleResponse({ result, setIsAuth, setUser, user, isAuth });
+      setIsLoading(false);
     }
 
     fetchData();
@@ -28,7 +30,8 @@ function App() {
     <div className='bg-slate-50 h-screen text-slate-900 flex flex-col overflow-hidden'>
       <Navbar isAuth={isAuth} onLogout={onLogout} />
       <main className="flex-1 min-h-0 overflow-auto">
-        <Outlet context={{ user, isAuth }} />
+        {console.log("reached step 1")}
+        <Outlet context={{ user, isAuth, isLoading }} />
       </main>
     </div>
   )

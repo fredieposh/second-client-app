@@ -39,4 +39,48 @@ function handleResponse({ result, setIsAuth, setUser, user, isAuth }) {
     }
 }
 
-export { convertMessagesTimeFormat, handleResponse, handleLogout };
+function isContentJson(content) {
+    try {
+        const parsed = JSON.parse(content);
+        if (parsed?.type === "doc") return parsed;
+    } catch {
+        return false;
+    };
+};
+
+function contentToTiptap(raw) {
+    const parseContent = isContentJson(raw);
+    if (parseContent) return parseContent;
+
+    const paras = raw.split('\n').map(line => ({
+        type: "paragraph",
+        content: line ? [{ type: "text", text: line}]: []
+    }));
+
+    return { type: 'doc', content: paras };
+}
+
+async function handlePostUpdate({postId, userId, title, content, navigate}) {
+    const response = await fetch(`http://localhost:3000/users/${userId}/posts/${postId}`, {
+        method: 'PUT',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ title, content }),
+        credentials: 'include',
+    });
+    const result = await response.json();
+    if (response.status >= 400) {
+        throw new Error(result.msg);
+    };
+    navigate(`/users/${userId}/posts/${postId}`, { state: { postContent:content, postTitle: title}})
+};
+
+export {
+    convertMessagesTimeFormat, 
+    handleResponse, 
+    handleLogout, 
+    contentToTiptap, 
+    handlePostUpdate,
+    isContentJson,
+};

@@ -49,6 +49,7 @@ function isContentJson(content) {
 };
 
 function contentToTiptap(raw) {
+    if (!raw) return { type: 'doc', content: [{ type: 'paragraph' }] };
     const parseContent = isContentJson(raw);
     if (parseContent) return parseContent;
 

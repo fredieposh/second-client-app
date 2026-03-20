@@ -86,7 +86,7 @@ export function PostEditor() {
     const { postTitle, postContent, createdAt, isPublished } = location.state || {};
 
     
-    const initialContent = isNew ? {}: postContent;
+    const initialContent = isNew ? '' : postContent;
     
     const editor = useEditor({
         extensions: [StarterKit],
@@ -96,8 +96,6 @@ export function PostEditor() {
     useEffect(() => {
         if (!isNew && postTitle) setEditorPostTitle(postTitle);
     }, [isNew, postTitle]);
-
-    const editorPostContent = JSON.stringify(editor.getJSON());
 
     return (
         <div>
@@ -113,7 +111,7 @@ export function PostEditor() {
                 <EditorContent editor={editor} />
             </div>
             <button
-            onClick={() => handlePostUpdate({ postId, userId, title: editorPostTitle, content: editorPostContent, navigate})}
+            onClick={() => handlePostUpdate({ postId, userId, title: editorPostTitle, content: JSON.stringify(editor.getJSON()), navigate})}
             className="bg-blue-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-blue-700 hover:cursor-pointer transition-colors"
             >
                 Save

@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
-import { NavLink, useParams, useOutletContext, useNavigate, Outlet, Navigate } from "react-router";
-import { PostCard, PostsList, PostEditor } from "./Post.jsx";
-import { CommentsList } from "./Comments.jsx";
+import { NavLink, useParams, useOutletContext, useNavigate, Outlet, Navigate, useLocation } from "react-router";
 
 function Home() {
     const { userId } = useParams();
     const { isAuth, isLoading, user } = useOutletContext();
+    const navigate = useNavigate();
+    const location = useLocation();
     const [posts, setPosts] = useState(null);
-    console.log("reached step 2")
+    
+    const refreshKey = location?.state?.refreshKey;
+    const isPostsRoute = location.pathname.replace(/\/$/, "") === `/users/${userId}/posts`;
+
     useEffect(() => {
         if (!isAuth) return;
         
@@ -23,7 +26,7 @@ function Home() {
         }
 
         fetchPosts();
-    }, [userId, isAuth]);
+    }, [userId, isAuth, refreshKey]);
     
     if (isLoading) {
         return <div>Loading...</div>
@@ -34,7 +37,7 @@ function Home() {
     };
 
     return (
-        <div className="flex h-full">
+        <div className="relative flex h-full">
             <aside className="w-48 shrink-0 border-r border-slate-300 bg-slate-50 flex flex-col pt-6 gap-2 px-3">
                 <NavLink
                     to={`/users/${userId}/posts`}
@@ -52,6 +55,15 @@ function Home() {
             <main className="flex-1 overflow-auto p-6">
                 <Outlet context={{posts, id: userId}} />
             </main>
+            {isPostsRoute && (
+                <button
+                    type="button"
+                    onClick={() => navigate(`/users/${userId}/posts/new`)}
+                    className="fixed bottom-6 right-6 rounded-full bg-slate-900 px-5 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:cursor-pointer hover:bg-slate-700"
+                >
+                    New Post +
+                </button>
+            )}
         </div>
     );
 }

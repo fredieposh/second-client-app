@@ -61,7 +61,7 @@ function contentToTiptap(raw) {
     return { type: 'doc', content: paras };
 }
 
-async function handlePostUpdate({postId, userId, title, content, navigate}) {
+async function handlePostUpdate({ postId, userId, title, content, navigate, isNew }) {
     const response = await fetch(`http://localhost:3000/users/${userId}/posts/${postId}`, {
         method: 'PUT',
         headers: {
@@ -77,11 +77,35 @@ async function handlePostUpdate({postId, userId, title, content, navigate}) {
     navigate(`/users/${userId}/posts/${postId}`, { state: { postContent:content, postTitle: title}})
 };
 
+async function handlePostCreation({ postId, userId, title, content, navigate, isNew }) {
+    const response = await fetch(`http://localhost:3000/users/${userId}/posts/`, {
+        method: 'Post',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ title, content }),
+        credentials: 'include',
+    });    
+    const result = await response.json();
+    if (response.status >= 400) {
+        throw new Error(result.msg);
+    };
+    navigate(`/users/${userId}/posts/`, { state: { postContent:content, postTitle: title, refreshKey: Date.now()}})
+};
+
+async function handlePostAction({ postId, userId, title, content, navigate, isNew }) {
+    isNew
+        ? await handlePostCreation({ postId, userId, title, content, navigate })
+        : await handlePostUpdate({ postId, userId, title, content, navigate });
+};
+
 export {
     convertMessagesTimeFormat, 
     handleResponse, 
     handleLogout, 
     contentToTiptap, 
     handlePostUpdate,
+    handlePostCreation,
+    handlePostAction,
     isContentJson,
 };

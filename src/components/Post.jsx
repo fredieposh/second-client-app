@@ -4,7 +4,7 @@ import { convertMessagesTimeFormat } from "../utils.jsx";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { generateHTML } from "@tiptap/html";
 import StarterKit from "@tiptap/starter-kit";
-import { contentToTiptap, handlePostUpdate, isContentJson } from "../utils.jsx";
+import { contentToTiptap, handlePostAction, isContentJson } from "../utils.jsx";
 import Toolbar from "./Toolbar.jsx";
 
 const publishedBadgeClass = "bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-semibold";
@@ -111,7 +111,14 @@ export function PostEditor() {
                 <EditorContent editor={editor} />
             </div>
             <button
-            onClick={() => handlePostUpdate({ postId, userId, title: editorPostTitle, content: JSON.stringify(editor.getJSON()), navigate})}
+            onClick={() => handlePostAction({
+                postId, 
+                userId, 
+                title: editorPostTitle, 
+                content: JSON.stringify(editor.getJSON()), 
+                navigate, 
+                isNew
+            })}
             className="bg-blue-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-blue-700 hover:cursor-pointer transition-colors"
             >
                 Save
